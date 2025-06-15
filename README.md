@@ -1,40 +1,40 @@
 <p align="center">
+  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/ubuntu/ubuntu-plain-wordmark.svg" alt="Ubuntu" width="180"/>
   <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original-wordmark.svg" alt="Docker" width="200"/>
   <br>
-  <h1>Secure RDP over Internet with Playit.gg</h1>
-  <p>Akses lingkungan desktop pribadi Anda dari mana saja secara aman menggunakan Docker dan tunnel instan dari Playit.gg.</p>
+  <h1>Personal Ubuntu SSH Server, Anywhere!</h1>
+  <p>Jalankan server Ubuntu 20.04 pribadi Anda di dalam Docker dan akses melalui SSH dari mana saja di dunia, berkat tunnel instan dari Playit.gg.</p>
 </p>
 
 <p align="center">
-    <img src="https://img.shields.io/badge/Docker%20Compose-v3.8-blue?style=for-the-badge&logo=docker" alt="Docker Compose Version">
+    <img src="https://img.shields.io/badge/Ubuntu-20.04_LTS-E95420?style=for-the-badge&logo=ubuntu" alt="Ubuntu Version">
+    <img src="https://img.shields.io/badge/Docker%20Compose-Ready-blue?style=for-the-badge&logo=docker" alt="Docker Compose">
+    <img src="https://img.shields.io/badge/Access-SSH-lightgrey?style=for-the-badge&logo=openssh" alt="SSH Access">
     <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge" alt="Project Status">
-    <img src="https://img.shields.io/docker/pulls/linuxserver/rdesktop?style=for-the-badge&logo=docker" alt="Docker Pulls">
-    <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
 </p>
 
 ---
 
-## 🚀 Fitur Utama
+Selamat datang di cara termudah untuk memiliki lingkungan shell Linux pribadi yang dapat diakses secara global. Proyek ini menggunakan `Dockerfile` untuk membangun image Ubuntu 20.04 kustom yang sudah dilengkapi dengan server SSH, lalu `Docker Compose` mengorkestrasi semuanya bersama tunnel `playit.gg` yang aman.
 
-Proyek ini memungkinkan Anda untuk menjalankan desktop Linux (XFCE) di dalam kontainer Docker dan mengaksesnya melalui RDP dari mana saja di dunia tanpa perlu konfigurasi port forwarding atau IP publik yang rumit.
+## 🚀 Fitur Andalan
 
-* ✨ **Zero-Config Tunneling**: Langsung online dengan `playit.gg` tanpa pengaturan router.
-* 🐳 **Sepenuhnya Terkontainerisasi**: Seluruh setup (RDP & Tunnel) diatur oleh Docker Compose.
-* 🔒 **Aman Secara Default**: Tidak ada port yang diekspos ke publik. Kredensial disimpan dengan aman di file `.env`.
-* 💾 **Penyimpanan Persisten**: Data dan konfigurasi desktop Anda akan tetap ada bahkan setelah restart.
-* 🌐 **Akses Global**: Hubungkan RDP Anda dari jaringan mana pun selama ada koneksi internet.
+* ⚡ **Server Pribadi Instan**: Dapatkan shell Ubuntu 20.04 yang berfungsi penuh dalam hitungan menit.
+* 🔧 **Image Kustom**: `Dockerfile` disertakan agar Anda bisa dengan mudah memodifikasi dan menambahkan software sesuai kebutuhan.
+* 🌐 **Akses Global via SSH**: Tidak perlu IP publik atau konfigurasi router yang rumit. Cukup gunakan alamat dari `playit.gg`.
+* 🐳 **Orkestrasi Docker Compose**: Setup dua kontainer yang kompleks menjadi sangat sederhana dengan satu file `docker-compose.yml`.
+* 🔒 **Keamanan Terisolasi**: Berjalan di dalam kontainer Docker yang terisolasi dan tidak mengekspos port apa pun ke host Anda.
+* 💾 **Penyimpanan Persisten**: `Home directory` Anda disimpan dalam volume, sehingga file Anda aman bahkan setelah kontainer di-restart.
 
 ##  diagrama Arsitektur
 
-Berikut adalah gambaran sederhana tentang bagaimana semua komponen terhubung:
-
 ```mermaid
 graph TD
-    A[👨‍💻 Anda] -->|Klien RDP| B(🌐 Internet);
+    A[👨‍💻 Anda] -->|Klien SSH| B(🌐 Internet);
     B --> C{🌍 Playit.gg Cloud};
     subgraph "🐳 Mesin Docker Anda"
         C <--> D[Tunnel Container];
-        D -->|Koneksi Internal Docker| E[RDP Desktop Container];
+        D -->|Koneksi Internal Docker| E[Ubuntu SSH Server (Custom Build)];
     end
 
     style A fill:#D6EAF8,stroke:#333,stroke-width:2px
