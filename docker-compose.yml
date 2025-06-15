@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  rdp:
+    image: lscr.io/linuxserver/rdesktop:latest
+    container_name: rdp-desktop
+    security_opt:
+      - seccomp:unconfined # Diperlukan untuk beberapa fungsionalitas desktop
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Jakarta
+      - USER=user # Ganti 'user' dengan username yang Anda inginkan
+      - PASSWORD=${RDP_PASSWORD} # Password akan diambil dari file .env
+    volumes:
+      - ./rdp-config:/config # Menyimpan konfigurasi dan data user RDP
+    shm_size: '1gb' # Ukuran shared memory, penting untuk performa browser di dalam RDP
+    restart: unless-stopped
+
+  playit-tunnel:
+    image: debian:slim-buster
+    container_name: playit-tunnel
+    working_dir: /data
+    environment:
+      - PLAYIT_AGENT_SECRET=${PLAYIT_AGENT_SECRET} # Secret key akan diambil dari file .env
+    volumes:
+      - ./playit-data:/data # Menyimpan binary playit agar tidak download ulang
+    command: >
+      bash -c "
+        if [ ! -f ./playit ]; then
+          echo 'Downloading playit...'
+          curl -sSL 'https://github.com/playit-cloud/playit-agent/releases/latest/download/playit-linux-amd64' -o playit && chmod +x playit;
+        fi;
+        echo 'Starting playit tunnel...';
+        ./playit -secret ${PLAYIT_AGENT_SECRET} --auto-create-tunnel --tcp rdp:3389
+      "
+    depends_on:
+      - rdp
+    restart: unless-stopped
+
