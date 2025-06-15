@@ -32,9 +32,12 @@ Selamat datang di cara termudah untuk memiliki lingkungan shell Linux pribadi ya
 graph TD
     A[👨‍💻 Anda] -->|Klien SSH| B(🌐 Internet);
     B --> C{🌍 Playit.gg Cloud};
+    
     subgraph "🐳 Mesin Docker Anda"
-        C <--> D[Tunnel Container];
-        D -->|Koneksi Internal Docker| E[Ubuntu SSH Server (Custom Build)];
+        E[Ubuntu SSH Server (Custom Build)];
+        D[Tunnel Container];
+        C <--> D;
+        D -->|Koneksi Internal Docker| E;
     end
 
     style A fill:#D6EAF8,stroke:#333,stroke-width:2px
