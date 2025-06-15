@@ -1,40 +1,36 @@
 version: '3.8'
 
 services:
-  rdp:
-    image: lscr.io/linuxserver/rdesktop:latest
-    container_name: rdp-desktop
-    security_opt:
-      - seccomp:unconfined # Diperlukan untuk beberapa fungsionalitas desktop
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Asia/Jakarta
-      - USER=user # Ganti 'user' dengan username yang Anda inginkan
-      - PASSWORD=${RDP_PASSWORD} # Password akan diambil dari file .env
-    volumes:
-      - ./rdp-config:/config # Menyimpan konfigurasi dan data user RDP
-    shm_size: '1gb' # Ukuran shared memory, penting untuk performa browser di dalam RDP
+  ssh-server:
+    # Alih-alih 'image', kita gunakan 'build' untuk membuat image dari Dockerfile
+    build:
+      context: ./ubuntu-ssh # Path ke direktori yang berisi Dockerfile
+      args:
+        # Kirim variabel SSH_PASSWORD dari file .env ke Dockerfile saat build
+        - SSH_PASSWORD=${SSH_PASSWORD}
+    container_name: ubuntu-ssh-server
     restart: unless-stopped
+    volumes:
+      # Membuat home directory user persisten
+      - ./ssh-home:/home/dockeruser
 
   playit-tunnel:
     image: debian:slim-buster
-    container_name: playit-tunnel
+    container_name: playit-ssh-tunnel
     working_dir: /data
     environment:
-      - PLAYIT_AGENT_SECRET=${PLAYIT_AGENT_SECRET} # Secret key akan diambil dari file .env
+      - PLAYIT_AGENT_SECRET=${PLAYIT_AGENT_SECRET}
     volumes:
-      - ./playit-data:/data # Menyimpan binary playit agar tidak download ulang
+      - ./playit-data:/data
     command: >
       bash -c "
         if [ ! -f ./playit ]; then
-          echo 'Downloading playit...'
           curl -sSL 'https://github.com/playit-cloud/playit-agent/releases/latest/download/playit-linux-amd64' -o playit && chmod +x playit;
         fi;
-        echo 'Starting playit tunnel...';
-        ./playit -secret ${PLAYIT_AGENT_SECRET} --auto-create-tunnel --tcp rdp:3389
+        echo 'Starting playit tunnel for SSH...';
+        # Arahkan tunnel ke layanan 'ssh-server' di port 22
+        ./playit -secret ${PLAYIT_AGENT_SECRET} --auto-create-tunnel --tcp ssh-server:22
       "
     depends_on:
-      - rdp
+      - ssh-server
     restart: unless-stopped
-
